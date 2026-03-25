@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--
+    ============================================
+    Smart Soil Moisture Monitoring - Home Page
+    ============================================
+    
+    A stunning 3D interactive landing page featuring:
+    - Three.js animated hero section
+    - GSAP scroll animations
+    - Glassmorphism design
+    - Responsive layout
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="IoT-based Smart Soil Moisture Monitoring System - Real-time monitoring for smart agriculture">
+    <meta name="keywords" content="IoT, soil moisture, smart agriculture, ESP32, Firebase, monitoring">
+
+    <title>AgriSense</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+</head>
+
+<body>
+    <!-- ============================================
+         Navigation Bar
+         ============================================ -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🌱</span>
+                <span>AgriSense</span>
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#problem" data-i18n="nav.problem">Problem</a></li>
+                <li><a href="#solution" data-i18n="nav.solution">Solution</a></li>
+                <li><a href="#how-it-works" data-i18n="nav.howItWorks">How It Works</a></li>
+                <li><a href="#technologies" data-i18n="nav.technologies">Technologies</a></li>
+            </ul>
+
+
+
+            <!-- Language Selector -->
+            <div class="language-wrapper">
+                <select id="languageSelect" class="language-select" aria-label="Select Language">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                    <option value="ml">മലയാളം (Malayalam)</option>
+                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                </select>
+            </div>
+
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ============================================
+         Hero Section with 3D Animation
+         ============================================ -->
+    <section class="hero" id="hero">
+        <!-- Three.js Canvas -->
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+
+        <!-- Gradient Overlay -->
+        <div class="hero-overlay"></div>
+
+        <!-- Floating Icons -->
+        <div class="hero-float-elements">
+            <span class="float-icon">💧</span>
+            <span class="float-icon">🌿</span>
+            <span class="float-icon">🌍</span>
+            <span class="float-icon">📡</span>
+            <span class="float-icon">🌱</span>
+            <span class="float-icon">☀️</span>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                <span data-i18n="hero.badge">AI/IoT-Powered Agriculture</span>
+            </div>
+
+            <h1 class="hero-title">
+                <span class="text-gradient highlight" data-i18n="hero.title">Agri Sense</span><br>
+
+            </h1>
+
+            <p class="hero-description" data-i18n="hero.description">
+                Smart Farming Powered by Real-Time Soil Intelligence, AI Chat Assistance & Crop Disease Detection.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="dashboard.html" class="btn btn-primary btn-lg">
+                    <span>🚀</span>
+                    <span data-i18n="hero.getStarted">Get Started</span>
+                </a>
+
+                <a href="chatbot.html" class="btn btn-parrot btn-lg">
+                    <span>🤖</span>
+                    <span data-i18n="hero.agriBot">AgriBot AI</span>
+                </a>
+                <a href="#how-it-works" class="btn btn-secondary btn-lg">
+                    <span>📖</span>
+                    <span data-i18n="hero.learnMore">Learn More</span>
+                </a>
+
+                <!-- NEW BUTTON: Crop Disease Detector -->
+                <a href="disease_detector.html" class="btn btn-warning btn-lg">
+                    <span>🦠</span>
+                    <span data-i18n="hero.diseaseDetector">Disease Detector</span>
+                </a>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="hero-scroll">
+                <div class="scroll-indicator"></div>
+                <span data-i18n="hero.scroll">Scroll to explore</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Problem Statement Section
+         ============================================ -->
+    <section class="section problem-section" id="problem">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label" data-i18n="problem.label">The Challenge</span>
+                <h2 class="section-title" data-i18n="problem.title">Why Traditional Methods <span
+                        class="text-gradient">Fail</span></h2>
+                <p class="section-description" data-i18n="problem.description">
+                    Manual irrigation and guesswork lead to significant problems in agriculture
+                </p>
+            </div>
+
+            <div class="problem-grid">
+                <div class="glass-card problem-card">
+                    <div class="problem-icon">💸</div>
+                    <h3 data-i18n="problem.card1.title">Water Waste</h3>
+                    <p data-i18n="problem.card1.desc">Over 40% of irrigation water is wasted due to improper timing and
+                        excessive watering without real
+                        data.</p>
+                </div>
+
+                <div class="glass-card problem-card">
+                    <div class="problem-icon">🥀</div>
+                    <h3 data-i18n="problem.card2.title">Crop Damage</h3>
+                    <p data-i18n="problem.card2.desc">Both over-watering and under-watering cause root diseases,
+                        nutrient loss, and reduced crop
+                        yields.</p>
+                </div>
+
+                <div class="glass-card problem-card">
+                    <div class="problem-icon">⏰</div>
+                    <h3 data-i18n="problem.card3.title">Time Consuming</h3>
+                    <p data-i18n="problem.card3.desc">Manual soil checking requires constant attention and physical
+                        presence in the field.</p>
+                </div>
+
+                <div class="glass-card problem-card">
+                    <div class="problem-icon">🔮</div>
+                    <h3 data-i18n="problem.card4.title">No Predictions</h3>
+                    <p data-i18n="problem.card4.desc">Without historical data, farmers cannot predict trends or optimize
+                        their irrigation schedules.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Solution Section
+         ============================================ -->
+    <section class="section solution-section" id="solution">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label" data-i18n="solution.label">Core Capabilities</span>
+                <h2 class="section-title" data-i18n="solution.title">Innovative <span class="text-gradient-cyan">Smart
+                        Farming</span></h2>
+                <p class="section-description" data-i18n="solution.description">
+                    Empowering farmers with cutting-edge AI and IoT technology.
+                </p>
+            </div>
+
+            <div class="solution-content">
+                <div class="solution-image">
+                    <div class="solution-glow"></div>
+                    <div class="solution-image-frame glass-card">
+                        <div
+                            style="height: 300px; display: flex; align-items: center; justify-content: center; font-size: 8rem; background: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(6,182,212,0.1) 100%);">
+                            🌱
+                        </div>
+                    </div>
+                </div>
+
+                <div class="solution-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">🦠</div>
+                        <div class="feature-content">
+                            <h4 data-i18n="solution.feature1.title">AI Crop Disease Detection</h4>
+                            <p data-i18n="solution.feature1.desc">Instantly diagnose crop health issues. Upload a photo
+                                and let our AI identify diseases
+                                with high accuracy and suggest treatments.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">💧</div>
+                        <div class="feature-content">
+                            <h4 data-i18n="solution.feature2.title">Real-Time Soil Monitoring</h4>
+                            <p data-i18n="solution.feature2.desc">Stay connected to your field 24/7. Track soil moisture
+                                levels in real-time and receive
+                                instant alerts to prevent water stress.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-content">
+                            <h4 data-i18n="solution.feature3.title">AI Personal Assistant</h4>
+                            <p data-i18n="solution.feature3.desc">Your intelligent farming companion. Ask questions
+                                about agriculture, weather, or market
+                                prices and get instant, data-driven answers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         How It Works Section
+         ============================================ -->
+    <section class="section flow-section" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label" data-i18n="flow.label">Working Flow</span>
+                <h2 class="section-title" data-i18n="flow.title">How <span class="text-gradient">AgriSense</span> Works
+                </h2>
+                <p class="section-description" data-i18n="flow.description">
+                    From sensor to dashboard in four simple steps
+                </p>
+            </div>
+
+            <div class="flow-timeline">
+                <div class="flow-line"></div>
+
+                <div class="flow-step">
+                    <div class="flow-number">1</div>
+                    <div class="glass-card flow-card">
+                        <h3 data-i18n="flow.step1.title">Data Collection</h3>
+                        <p data-i18n="flow.step1.desc">Soil sensors capture real-time moisture data, while farmers
+                            capture images of potentially
+                            diseased crops using their smartphones.</p>
+                    </div>
+                    <div class="flow-visual">📡</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-number">2</div>
+                    <div class="glass-card flow-card">
+                        <h3 data-i18n="flow.step2.title">AI Analysis</h3>
+                        <p data-i18n="flow.step2.desc">Data is sent to our secure cloud where Google Gemini AI analyzes
+                            crop images for diseases and
+                            algorithms process soil data.</p>
+                    </div>
+                    <div class="flow-visual">🧠</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-number">3</div>
+                    <div class="glass-card flow-card">
+                        <h3 data-i18n="flow.step3.title">Smart Insights</h3>
+                        <p data-i18n="flow.step3.desc">Receive instant disease diagnosis with treatment recommendations
+                            and real-time alerts for
+                            soil moisture status.</p>
+                    </div>
+                    <div class="flow-visual">💡</div>
+                </div>
+
+                <div class="flow-step">
+                    <div class="flow-number">4</div>
+                    <div class="glass-card flow-card">
+                        <h3 data-i18n="flow.step4.title">Intelligent Assistance</h3>
+                        <p data-i18n="flow.step4.desc">Interact with our AI Chatbot for personalized farming advice,
+                            weather updates, and market
+                            trends.</p>
+                    </div>
+                    <div class="flow-visual">🤖</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Technologies Section
+         ============================================ -->
+    <section class="section tech-section" id="technologies">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label" data-i18n="tech.label">Tech Stack</span>
+                <h2 class="section-title" data-i18n="tech.title">Technologies <span
+                        class="text-gradient-cyan">Used</span></h2>
+                <p class="section-description" data-i18n="tech.description">
+                    Built with modern, reliable, and scalable technologies
+                </p>
+            </div>
+
+            <div class="tech-grid">
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">🧠</div>
+                    <h4>Gemini AI</h4>
+                    <p>Generative AI</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">🐍</div>
+                    <h4>Python</h4>
+                    <p>AI Backend</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">⚡</div>
+                    <h4>FastAPI</h4>
+                    <p>High Performance</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">🔧</div>
+                    <h4>ESP32</h4>
+                    <p>IoT Hardware</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">🔥</div>
+                    <h4>Firebase</h4>
+                    <p>Realtime DB</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">🌐</div>
+                    <h4>HTML/CSS/JS</h4>
+                    <p>Frontend</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">🎨</div>
+                    <h4>Three.js</h4>
+                    <p>3D Graphics</p>
+                </div>
+
+                <div class="glass-card tech-card">
+                    <div class="tech-icon">✨</div>
+                    <h4>GSAP</h4>
+                    <p>Animations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Call to Action Section
+         ============================================ -->
+    <section class="cta-section" id="cta">
+        <div class="cta-glow"></div>
+        <div class="container">
+            <div class="cta-content">
+                <h2 data-i18n="cta.title">Ready to Monitor Your Soil?</h2>
+                <p data-i18n="cta.desc">Access the real-time dashboard and start making data-driven irrigation decisions
+                    today.</p>
+                <a href="dashboard.html" class="btn btn-primary btn-lg">
+                    <span>🚀</span>
+                    <span data-i18n="cta.button">Open Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         Footer
+         ============================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span>🌱</span>
+                    <span>AgriSense</span>
+                </div>
+
+                <div class="footer-links">
+                    <a href="#problem" data-i18n="nav.problem">Problem</a>
+                    <a href="#solution" data-i18n="nav.solution">Solution</a>
+                    <a href="#how-it-works" data-i18n="nav.howItWorks">How It Works</a>
+                    <a href="dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+                </div>
+
+                <div class="footer-copyright" data-i18n="footer.copyright">
+                    © 2024 AgriSense. Smart Agriculture Solution.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         Scripts
+         ============================================ -->
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <!-- Custom Scripts -->
+    <script src="js/three-scene.js"></script>
+    <script src="js/gsap-animations.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Multilingual Support -->
+    <script src="js/translations.js"></script>
+    <script src="js/language-toggle.js"></script>
+</body>
+
+</html>

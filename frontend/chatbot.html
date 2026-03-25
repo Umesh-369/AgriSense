@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriVision - Professional AI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+            overflow: hidden;
+            color: white;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(52, 211, 153, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .messages-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages-area::-webkit-scrollbar-thumb {
+            background: rgba(52, 211, 153, 0.2);
+            border-radius: 10px;
+        }
+
+        .mic-active {
+            animation: pulse 1.5s infinite;
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .message-bubble {
+            max-width: 85%;
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .message-bubble ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 15px 0;
+        }
+
+        .message-bubble li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 12px;
+            border-left: 1px solid rgba(52, 211, 153, 0.2);
+            margin-left: 5px;
+        }
+
+        .message-bubble li::before {
+            content: '→';
+            position: absolute;
+            left: 8px;
+            color: #34d399;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-message {
+            background: rgba(15, 23, 42, 0.9);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(52, 211, 153, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(5, 150, 105, 0.2);
+        }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #34d399;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .feature-item.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+
+        .section-header {
+            color: #34d399;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            display: block;
+            border-bottom: 1px solid rgba(52, 211, 153, 0.1);
+            padding-bottom: 4px;
+        }
+
+        .brief-overview {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Back Button Style Override */
+        .back-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .back-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="flex h-screen w-screen overflow-hidden">
+
+    <div id="canvas-container"></div>
+
+    <!-- Main Sidebar -->
+    <aside class="w-80 h-full glass-panel z-20 border-r flex flex-col p-6 hidden md:flex">
+        <div class="mb-10">
+            <h1 class="text-3xl font-extrabold tracking-tighter uppercase italic">Agri<span
+                    class="gradient-text">Vision..</span></h1>
+            <p class="text-emerald-400/70 text-[10px] font-bold tracking-[0.2em] mt-1">AI CORE MONITORING</p>
+        </div>
+
+        <nav class="flex-1 space-y-2">
+            <a href="index.html" class="back-nav-btn mb-6">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+            </a>
+
+            <p class="text-[10px] text-gray-500 font-bold tracking-widest uppercase mb-4 px-2">Analysis Tools</p>
+
+            <button
+                class="feature-item active w-full flex items-center gap-4 px-4 py-3 rounded-xl border border-transparent transition-all group">
+                <i data-lucide="zap" class="w-5 h-5"></i>
+                <span class="font-semibold text-sm">Real-time Insights</span>
+            </button>
+            <button
+                class="feature-item w-full flex items-center gap-4 px-4 py-3 rounded-xl border border-white/5 hover:bg-white/5 transition-all text-gray-400 hover:text-white">
+                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                <span class="font-semibold text-sm">Market Intelligence</span>
+            </button>
+            <button
+                class="feature-item w-full flex items-center gap-4 px-4 py-3 rounded-xl border border-white/5 hover:bg-white/5 transition-all text-gray-400 hover:text-white">
+                <i data-lucide="droplet" class="w-5 h-5"></i>
+                <span class="font-semibold text-sm">Hydration Analysis</span>
+            </button>
+            <button
+                class="feature-item w-full flex items-center gap-4 px-4 py-3 rounded-xl border border-white/5 hover:bg-white/5 transition-all text-gray-400 hover:text-white">
+                <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                <span class="font-semibold text-sm">Threat Detection</span>
+            </button>
+        </nav>
+
+        <div class="mt-auto space-y-4">
+            <div class="glass-card p-4 rounded-2xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <span class="text-[10px] text-emerald-400 uppercase tracking-widest font-bold">Live Data Feed</span>
+                </div>
+
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 h-full flex flex-col z-10 relative">
+        <!-- Top Header -->
+        <header class="h-20 border-b border-white/5 glass-panel flex items-center justify-between px-8">
+            <div class="flex items-center gap-4">
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                    <i data-lucide="brain-circuit" class="text-emerald-400 w-6 h-6"></i>
+                </div>
+                <div>
+                    <h2 class="font-bold text-lg">AgriBot</h2>
+
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div id="voice-waves" class="hidden items-center gap-1.5 h-6">
+                    <span class="w-1 h-4 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_0.1s]"></span>
+                    <span class="w-1 h-6 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_0.2s]"></span>
+                    <span class="w-1 h-3 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_0.3s]"></span>
+                    <span class="w-1 h-5 bg-emerald-400 rounded-full animate-[bounce_0.8s_infinite_0.4s]"></span>
+                </div>
+
+            </div>
+        </header>
+
+        <!-- Chat History -->
+        <div id="messages" class="flex-1 overflow-y-auto p-8 flex flex-col messages-area">
+            <div class="ai-message message-bubble">
+                <span class="brief-overview">System initialized. Analysis protocol ready.</span>
+                <span class="section-header">Operational Capacity</span>
+                <ul>
+                    <li>Structured output strictly limited to key findings.</li>
+                    <li>Concise, professional data interpretation.</li>
+                    <li>Synchronized voice assistant with instant-stop control.</li>
+                </ul>
+                <p class="text-[10px] text-gray-500 mt-4">Awaiting agricultural inquiry...</p>
+            </div>
+        </div>
+
+        <!-- Voice Status Indicator -->
+        <div id="voice-status"
+            class="hidden absolute bottom-24 left-1/2 -translate-x-1/2 z-30 transition-all duration-300">
+            <div class="glass-card px-6 py-2 rounded-full flex items-center gap-3 border border-emerald-500/30">
+                <div class="loader w-4 h-4 border-2 border-emerald-400"></div>
+                <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase">Synthesizing Voice...</span>
+            </div>
+        </div>
+
+        <!-- Stop Audio Overlay -->
+        <div id="stop-voice-container" class="hidden absolute bottom-36 left-1/2 -translate-x-1/2 z-30">
+            <button id="stop-voice"
+                class="bg-red-500/80 hover:bg-red-500 text-white px-10 py-4 rounded-full border border-red-400/40 text-[10px] font-black tracking-[0.3em] transition-all flex items-center gap-4 backdrop-blur-3xl shadow-[0_0_60px_rgba(239,68,68,0.4)]">
+                <i data-lucide="octagon" class="w-4 h-4 fill-white"></i> STOP ASSISTANT VOICE
+            </button>
+        </div>
+
+        <!-- Input Section -->
+        <div class="p-10">
+            <div class="max-w-4xl mx-auto relative">
+                <div
+                    class="glass-panel p-2.5 rounded-2xl flex items-center gap-4 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)]">
+                    <button id="mic-btn"
+                        class="w-14 h-14 rounded-xl bg-white/5 hover:bg-emerald-500/20 border border-white/5 flex items-center justify-center transition-all group shrink-0">
+                        <i data-lucide="mic" class="text-gray-400 group-hover:text-emerald-400 transition-colors"></i>
+                    </button>
+
+                    <input type="text" id="chat-input" placeholder="Query crop prices or analysis..."
+                        class="flex-1 bg-transparent border-none outline-none text-white text-lg placeholder:text-gray-600 px-2 font-medium">
+
+                    <button id="send-btn"
+                        class="w-14 h-14 rounded-xl bg-emerald-600 hover:bg-emerald-500 flex items-center justify-center transition-all shadow-lg shadow-emerald-900/40 shrink-0">
+                        <i data-lucide="arrow-right" class="text-white w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Config & State
+        const BACKEND_URL = "http://localhost:8000/api";
+        const systemPrompt = "You are AgriBot..."; // handled by backend mostly but keeping for reference if needed locally, though backend handles it.
+
+        let isListening = false;
+        let isSpeaking = false;
+        let audioSource = null;
+
+        // --- THREE.JS SCENE ---
+        const initThree = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.PlaneGeometry(300, 300, 60, 60);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x10b981,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.08
+            });
+            const floor = new THREE.Mesh(geometry, material);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -8;
+            scene.add(floor);
+
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 4000;
+            const posArray = new Float32Array(particlesCount * 3);
+            for (let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 150;
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.03,
+                color: 0x34d399,
+                transparent: true,
+                opacity: 0.3,
+                blending: THREE.AdditiveBlending
+            });
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambientLight);
+            const spotLight = new THREE.SpotLight(0x34d399, 1.5);
+            spotLight.position.set(30, 60, 30);
+            scene.add(spotLight);
+
+            camera.position.z = 20;
+            camera.position.y = 8;
+            camera.lookAt(0, 0, 0);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                floor.rotation.z += 0.0004;
+                particlesMesh.rotation.y += 0.0002;
+                camera.position.x = Math.sin(Date.now() * 0.00005) * 4;
+                renderer.render(scene, camera);
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            animate();
+        };
+
+        // --- AI LOGIC ---
+        const exponentialBackoff = async (fn) => {
+            let delay = 1000;
+            for (let i = 0; i < 3; i++) {
+                try { return await fn(); } catch (error) {
+                    if (i === 2) throw error;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        };
+
+        const generateAIResponse = async (query) => {
+            const response = await exponentialBackoff(() => fetch(`${BACKEND_URL}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: query
+                })
+            }).then(res => {
+                if (!res.ok) throw new Error("Backend Error");
+                return res.json();
+            }));
+
+            return response.response || "Communication relay error. Analysis interrupted.";
+        };
+
+        // --- SPEECH SYNTHESIS (WEB SPEECH API) ---
+        const speakText = (text) => {
+            if (isSpeaking) stopSpeaking();
+
+            if (!('speechSynthesis' in window)) {
+                alert("Sorry, your browser doesn't support text-to-speech.");
+                return;
+            }
+
+            // Create a new utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+
+            // Configure voice settings
+            const voices = window.speechSynthesis.getVoices();
+            // Try to find a good English voice (e.g., Google US English, or Microsoft David/Zira)
+            const preferredVoice = voices.find(voice => voice.name.includes("Google US English") || voice.name.includes("Zira"));
+            if (preferredVoice) utterance.voice = preferredVoice;
+
+            utterance.rate = 1.0; // Normal speed
+            utterance.pitch = 1.0; // Normal pitch
+            utterance.volume = 1.0;
+
+            // Events
+            utterance.onstart = () => {
+                isSpeaking = true;
+                document.getElementById('voice-waves').classList.remove('hidden');
+                document.getElementById('voice-waves').classList.add('flex');
+                document.getElementById('stop-voice-container').classList.remove('hidden');
+
+                // Hide synthesizing status
+                const voiceStatus = document.getElementById('voice-status');
+                if (voiceStatus) voiceStatus.classList.add('hidden');
+            };
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                document.getElementById('voice-waves').classList.add('hidden');
+                document.getElementById('stop-voice-container').classList.add('hidden');
+            };
+
+            utterance.onerror = (e) => {
+                console.error("Speech Synthesis Error:", e);
+                isSpeaking = false;
+                document.getElementById('voice-waves').classList.add('hidden');
+            };
+
+            // Speak
+            window.speechSynthesis.speak(utterance);
+        };
+
+        const stopSpeaking = () => {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            isSpeaking = false;
+            document.getElementById('voice-waves').classList.add('hidden');
+            document.getElementById('stop-voice-container').classList.add('hidden');
+        };
+
+        // Ensure voices are loaded (some browsers load them asynchronously)
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+
+        // --- UI FORMATTING ---
+        const formatAnalysis = (text) => {
+            // REMOVED: Aggressive stripping of * and # which broke markdown parsing
+            // let cleanText = text.replace(/\*/g, '').replace(/#/g, ''); 
+
+            // Handle Structure
+            let formatted = text
+                .replace(/\[OVERVIEW\]/gi, '<div class="brief-overview">Analysis Summary</div>')
+                .replace(/\[KEY FINDINGS\]/gi, '<div class="section-header">Critical Insights</div>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>'); // Cyan/Emerald bold
+
+            // Convert bullets (hyphens or asterisks at start of line) to list items
+            // We split by newline to handle line-by-line formatting accurately
+            const lines = formatted.split('\n');
+            let inList = false;
+            let resultHtml = '';
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                // Check for bullet point
+                if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                    if (!inList) {
+                        resultHtml += '<ul class="mt-2 space-y-2">';
+                        inList = true;
+                    }
+                    // Process bolding within list items
+                    let content = trimmed.substring(2);
+                    content = content.replace(/\*\*(.*?)\*\*/g, '<strong class="text-emerald-400">$1</strong>');
+                    resultHtml += `<li class="flex items-start gap-2 text-sm leading-relaxed"><span class="text-emerald-500 mt-1">→</span><span>${content}</span></li>`;
+                } else {
+                    if (inList) {
+                        resultHtml += '</ul>';
+                        inList = false;
+                    }
+                    if (trimmed.length > 0 && !trimmed.includes('Analysis Summary') && !trimmed.includes('Critical Insights')) {
+                        resultHtml += `<p class="mb-2 text-gray-300">${line}</p>`;
+                    } else {
+                        resultHtml += line;
+                    }
+                }
+            });
+
+            if (inList) resultHtml += '</ul>';
+
+            return resultHtml;
+        };
+
+        const addMessage = (text, isUser = false) => {
+            const container = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message-bubble ${isUser ? 'user-message' : 'ai-message'}`;
+
+            if (!isUser) {
+                div.innerHTML = formatAnalysis(text);
+            } else {
+                div.textContent = text;
+            }
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        };
+
+        const handleChat = async () => {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            addMessage(text, true);
+
+            const loadingId = 'l-' + Date.now();
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = loadingId;
+            loadingDiv.className = 'ai-message message-bubble flex items-center gap-4 italic text-gray-500 font-medium';
+            loadingDiv.innerHTML = '<span class="loader"></span>...';
+            document.getElementById('messages').appendChild(loadingDiv);
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+
+            try {
+                const response = await generateAIResponse(text);
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                addMessage(response);
+
+                // Show voice synthesizing indicator
+                const voiceStatus = document.getElementById('voice-status');
+                if (voiceStatus) voiceStatus.classList.remove('hidden');
+
+                speakText(response);
+
+                // Hide indicator after speakText finishes (or starts playing)
+                if (voiceStatus) voiceStatus.classList.add('hidden');
+
+            } catch (e) {
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.innerHTML = "SYSTEM ERROR: SIGNAL LOST (Backend Unreachable).";
+            }
+        };
+
+        // --- SPEECH RECOGNITION ---
+        const initRecognition = () => {
+            if (!('webkitSpeechRecognition' in window)) return null;
+            const rec = new webkitSpeechRecognition();
+            rec.onstart = () => {
+                isListening = true;
+                document.getElementById('mic-btn').classList.add('mic-active');
+                if (isSpeaking) stopSpeaking();
+            };
+            rec.onresult = (e) => {
+                document.getElementById('chat-input').value = e.results[0][0].transcript;
+                handleChat();
+            };
+            rec.onerror = rec.onend = () => {
+                isListening = false;
+                document.getElementById('mic-btn').classList.remove('mic-active');
+            };
+            return rec;
+        };
+
+        window.onload = () => {
+            if (window.lucide) lucide.createIcons();
+            initThree();
+            const recognition = initRecognition();
+
+            document.getElementById('send-btn').addEventListener('click', handleChat);
+            document.getElementById('chat-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleChat();
+            });
+
+            document.getElementById('mic-btn').addEventListener('click', () => {
+                if (!recognition) return alert("Browser voice support restricted.");
+                isListening ? recognition.stop() : recognition.start();
+            });
+
+            document.getElementById('stop-voice').addEventListener('click', stopSpeaking);
+        };
+    </script>
+
+</body>
+
+</html>
