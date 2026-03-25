@@ -9,7 +9,7 @@
 
 An IoT-based real-time soil moisture monitoring system featuring a stunning 3D interactive web interface, data visualization, and smart alerts.
 
-![Project Banner](https://images.unsplash.com/photo-1592982537447-6f2a6a0a2c8c?auto=format&fit=crop&q=80&w=1200&h=400)
+![Project Banner](assets/Poster.png)
 
 </div>
 
@@ -26,11 +26,11 @@ An IoT-based real-time soil moisture monitoring system featuring a stunning 3D i
 
 ---
 
-## 📷 Hardware Setup & Sensor
+## 📷 IoT Hardware Sensor
 
 <div align="center">
-  <img src="assets/iot-sensor.jpg" alt="IoT Sensor in Field" width="600" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 20px 0;">
-  <p><em>Our custom IoT sensor deployed in the field (Please place your uploaded image in <code>assets/iot-sensor.jpg</code>)</em></p>
+  <img src="assets/iot image.png" alt="IoT Soil Moisture Sensor deployed in the field" width="700">
+  <p><em>Capacitive Soil Moisture Sensor (ESP32-based) deployed in a crop field</em></p>
 </div>
 
 ### 🔧 Components Needed
@@ -41,34 +41,29 @@ An IoT-based real-time soil moisture monitoring system featuring a stunning 3D i
 
 ### 🔌 Wiring Diagram
 
-| Sensor Pin | Connection |
+| Sensor Pin | ESP32 Connection |
 | :--- | :--- |
 | `VCC` | `3.3V` |
 | `GND` | `GND` |
 | `AOUT` | `GPIO34` (ESP32) or `A0` (ESP8266) |
 
-*Instructions for uploading the code are located in the [IoT Hardware Setup](#-iot-hardware-setup-details) section.*
-
 ---
 
 ## 📸 Interface Preview
 
+### 🏠 Home Page — 3D Interactive Landing
+
 <div align="center">
-  <table width="100%">
-    <tr>
-      <td width="50%" align="center">
-        <b>Home Page (3D Hero)</b><br><br>
-        <img src="https://via.placeholder.com/500x300/1e293b/10b981?text=3D+Hero+Section" alt="Home Page" width="100%" style="border-radius: 8px;">
-      </td>
-      <td width="50%" align="center">
-        <b>Real-Time Dashboard</b><br><br>
-        <img src="https://via.placeholder.com/500x300/1e293b/3b82f6?text=Dashboard+%2B+Charts" alt="Dashboard" width="100%" style="border-radius: 8px;">
-      </td>
-    </tr>
-  </table>
+  <img src="assets/UI image.png" alt="AgriSense Home Page" width="100%">
 </div>
 
-*(You can update the above placeholders with your actual application screenshots by replacing the links)*
+---
+
+### 📊 Real-Time Dashboard
+
+<div align="center">
+  <img src="assets/Dashboard.png" alt="AgriSense Dashboard" width="100%">
+</div>
 
 ---
 
@@ -76,6 +71,8 @@ An IoT-based real-time soil moisture monitoring system featuring a stunning 3D i
 
 ```text
 3D-DTI/
+├── assets/                   # Images and media assets for this README
+│
 ├── backend/                  # Node.js REST API & Firebase integration
 │   ├── routes/               # Express endpoints (moisture.js)
 │   ├── utils/                # Moisture logic & thresholds
@@ -100,69 +97,75 @@ An IoT-based real-time soil moisture monitoring system featuring a stunning 3D i
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v16 or higher)
-- A [Firebase account](https://console.firebase.google.com/) for real-time data integration
-- Arduino IDE (if compiling the IoT firmware)
+- A [Firebase account](https://console.firebase.google.com/) for real-time data
+- Arduino IDE (if flashing the IoT firmware)
 
-### 1. Installation
-
-Clone the repository and install backend dependencies:
+### 1. Clone & Install
 
 ```bash
-git clone https://github.com/yourusername/3D-DTI.git
-cd 3D-DTI/backend
+git clone https://github.com/Umesh-369/AgriSense.git
+cd AgriSense/backend
 npm install
 ```
 
-### 2. Configure Firebase (Mandatory for Live Data)
+### 2. Configure Firebase
+
 1. Create a Firebase project and enable the **Realtime Database**.
-2. Go to Project Settings > Service Accounts and generate a new private key.
-3. Save the downloaded file as `backend/serviceAccountKey.json`.
-4. Copy the environment variables example and configure your database URL:
+2. Go to **Project Settings → Service Accounts** and generate a new private key.
+3. Save the file as `backend/serviceAccountKey.json`.
+4. Copy the environment variables example and update your database URL:
+
 ```bash
 cp .env.example .env
 ```
-Update `.env`:
+
 ```env
 FIREBASE_DATABASE_URL=https://your-project-id.firebaseio.com
 ```
 
 ### 3. Start the Server
+
 ```bash
 npm start
 ```
-*The server will start on `http://localhost:3000`.*
 
->**Note**: Without Firebase configuration, the application will run in **Demo Mode** using simulated data.
+> **Note**: Without Firebase configuration, the app runs in **Demo Mode** with simulated data.
+
+Open in browser:
+- 🏠 **Home:** [http://localhost:3000](http://localhost:3000)
+- 📊 **Dashboard:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
 
 ---
 
 ## 📊 API Endpoints Reference
 
 | Endpoint | Method | Description |
-|---|---|---|
+|:---|:---|:---|
 | `/api/health` | `GET` | Verifies server operational status |
 | `/api/moisture/current` | `GET` | Fetches the latest moisture reading |
 | `/api/moisture/history` | `GET` | Retrieves historical data (past 24h) |
 | `/api/moisture/status` | `GET` | Calculates current status and alerts |
-| `/api/moisture/thresholds`| `GET` | Returns threshold configuration data |
+| `/api/moisture/thresholds` | `GET` | Returns threshold configuration data |
 
 ---
 
 ## 💻 IoT Hardware Setup Details
 
-1. Open `iot/esp32_moisture_sensor.ino` in your Arduino IDE.
+1. Open `iot/esp32_moisture_sensor.ino` in your **Arduino IDE**.
 2. Install the **Firebase ESP Client** library by Mobizt via the Library Manager.
-3. Update the following lines with your network & Firebase credentials:
+3. Update credentials:
    ```cpp
-   #define WIFI_SSID "your_wifi_name"
-   #define WIFI_PASSWORD "your_wifi_password"
-   #define FIREBASE_HOST "your-project.firebaseio.com"
-   #define FIREBASE_AUTH "your_firebase_secret"
+   #define WIFI_SSID      "your_wifi_name"
+   #define WIFI_PASSWORD  "your_wifi_password"
+   #define FIREBASE_HOST  "your-project.firebaseio.com"
+   #define FIREBASE_AUTH  "your_firebase_secret"
    ```
 4. Flash the code to your ESP32/ESP8266 board.
 
 ### 🧪 Testing Without Hardware
-If you don't have the physical sensors yet, use the included simulator to generate realistic mock data:
+
+Use the included data simulator to generate realistic mock readings:
+
 ```bash
 cd iot
 node data_simulator.js
@@ -174,9 +177,9 @@ node data_simulator.js
 
 | Category | Technologies Used |
 | :--- | :--- |
-| **Frontend UI/UX** | HTML5, CSS3, JavaScript (ES6+), Glassmorphism UI |
+| **Frontend UI/UX** | HTML5, CSS3, JavaScript (ES6+), Glassmorphism |
 | **3D & Animation** | Three.js, GSAP (GreenSock) |
-| **Data Viz** | Chart.js |
+| **Data Visualization** | Chart.js |
 | **Backend & API** | Node.js, Express.js |
 | **Database** | Firebase Realtime Database |
 | **IoT / Hardware** | C++ (Arduino), ESP32 / ESP8266 |
@@ -184,13 +187,16 @@ node data_simulator.js
 ---
 
 ## 🤝 Contributing
+
 Contributions, issues, and feature requests are welcome!
-Feel free to check [issues page](https://github.com/yourusername/3D-DTI/issues).
+Feel free to open an [issue](https://github.com/Umesh-369/AgriSense/issues) or submit a pull request.
 
 ## 📄 License
+
 This project is [MIT](https://opensource.org/licenses/MIT) licensed.
 
 ---
+
 <div align="center">
-  <i>Designed & Developed with ❤️ for Smart Agriculture.</i>
+  <i>Designed & Developed with ❤️ for Smart Agriculture</i>
 </div>
