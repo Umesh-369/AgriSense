@@ -14,7 +14,6 @@ A full-stack smart agriculture platform combining **IoT soil monitoring**, **AI-
 ![Project Banner](assets/Poster.png)
 
 </div>
-
 ---
 
 ## 🌟 Key Features
